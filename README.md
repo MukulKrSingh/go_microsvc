@@ -51,44 +51,22 @@ This project demonstrates a microservices architecture for a restaurant ordering
 ## 🔍 Services Description
 
 ### 🍲 Restaurant Ordering Service
-<table>
-  <tr>
-    <td><strong>Features</strong></td>
-    <td>Authentication, food menu, ordering, transactions</td>
-  </tr>
-  <tr>
-    <td><strong>Tech Stack</strong></td>
-    <td>Go, Gin, PostgreSQL (SQL), Kafka Producer</td>
-  </tr>
-  <tr>
-    <td><strong>API Port</strong></td>
-    <td>8080</td>
-  </tr>
-  <tr>
-    <td><strong>Database</strong></td>
-    <td>PostgreSQL on port 5434 (mapped to container's 5432)</td>
-  </tr>
-</table>
+
+| Feature | Description |
+|---------|-------------|
+| **Features** | Authentication, food menu, ordering, transactions |
+| **Tech Stack** | Go, Gin, PostgreSQL (SQL), Kafka Producer |
+| **API Port** | 8080 |
+| **Database** | PostgreSQL on port 5434 (mapped to container's 5432) |
 
 ### 🌟 User Feedback Service
-<table>
-  <tr>
-    <td><strong>Features</strong></td>
-    <td>Feedback collection and analysis for orders</td>
-  </tr>
-  <tr>
-    <td><strong>Tech Stack</strong></td>
-    <td>Go, Gin, PostgreSQL (GORM), Kafka Consumer</td>
-  </tr>
-  <tr>
-    <td><strong>API Port</strong></td>
-    <td>8081</td>
-  </tr>
-  <tr>
-    <td><strong>Database</strong></td>
-    <td>PostgreSQL on port 5433 (mapped to container's 5432)</td>
-  </tr>
-</table>
+
+| Feature | Description |
+|---------|-------------|
+| **Features** | Feedback collection and analysis for orders |
+| **Tech Stack** | Go, Gin, PostgreSQL (GORM), Kafka Consumer |
+| **API Port** | 8081 |
+| **Database** | PostgreSQL on port 5433 (mapped to container's 5432) |
 
 ## 🌊 Data Flow
 
@@ -112,44 +90,30 @@ This project demonstrates a microservices architecture for a restaurant ordering
 
 ### Setup and Deployment
 
-<div class="steps-container">
-<div class="step">
-
 #### Step 1: Clone the Repository
 
 ```bash
 git clone <repository-url>
 cd go_microsvc
 ```
-</div>
-
-<div class="step">
 
 #### Step 2: Start All Microservices
 
 ```bash
 docker-compose up -d
 ```
-</div>
-
-<div class="step">
 
 #### Step 3: Verify the Deployment
 
 ```bash
 ./verify_deployment.sh
 ```
-</div>
-
-<div class="step">
 
 #### Step 4: Run Integration Tests
 
 ```bash
 ./test_microservices.sh
 ```
-</div>
-</div>
 
 ### 💻 Development Environment
 
@@ -194,14 +158,9 @@ docker-compose up -d
 
 ### 🍽️ Restaurant Ordering Service (port 8080)
 
-<div class="api-container">
-
 #### 🔑 Authentication
-<div class="api-endpoint">
-  <div class="method post">POST</div>
-  <div class="path">/auth</div>
-  <div class="description">Authenticate a user and get a JWT token</div>
-</div>
+
+**POST /auth** - Authenticate a user and get a JWT token
 
 <details>
 <summary>Example Request</summary>
@@ -215,25 +174,16 @@ docker-compose up -d
 </details>
 
 #### 🍔 Food Items
-<div class="api-endpoint">
-  <div class="method get">GET</div>
-  <div class="path">/food-items</div>
-  <div class="description">Get list of available food items</div>
-</div>
+
+**GET /food-items** - Get list of available food items
 
 #### 👤 User Profile
-<div class="api-endpoint">
-  <div class="method get">GET</div>
-  <div class="path">/profile</div>
-  <div class="description">Get authenticated user's profile (Requires JWT)</div>
-</div>
+
+**GET /profile** - Get authenticated user's profile (Requires JWT)
 
 #### 📋 Orders
-<div class="api-endpoint">
-  <div class="method post">POST</div>
-  <div class="path">/orders</div>
-  <div class="description">Place a new order (Requires JWT)</div>
-</div>
+
+**POST /orders** - Place a new order (Requires JWT)
 
 <details>
 <summary>Example Request</summary>
@@ -249,11 +199,8 @@ docker-compose up -d
 </details>
 
 #### 💳 Transactions
-<div class="api-endpoint">
-  <div class="method post">POST</div>
-  <div class="path">/transactions</div>
-  <div class="description">Complete a transaction for an order (Requires JWT)</div>
-</div>
+
+**POST /transactions** - Complete a transaction for an order (Requires JWT)
 
 <details>
 <summary>Example Request</summary>
@@ -320,14 +267,9 @@ details summary {
 
 ### 🌟 User Feedback Service (port 8081)
 
-<div class="api-container">
-
 #### 🔑 Authentication
-<div class="api-endpoint">
-  <div class="method post">POST</div>
-  <div class="path">/auth</div>
-  <div class="description">Authenticate a user and get a JWT token</div>
-</div>
+
+**POST /auth** - Authenticate a user and get a JWT token
 
 <details>
 <summary>Example Request</summary>
@@ -342,11 +284,7 @@ details summary {
 
 #### 📝 Feedback Management
 
-<div class="api-endpoint">
-  <div class="method post">POST</div>
-  <div class="path">/feedback</div>
-  <div class="description">Submit feedback for an order (Requires JWT)</div>
-</div>
+**POST /feedback** - Submit feedback for an order (Requires JWT)
 
 <details>
 <summary>Example Request</summary>
@@ -360,17 +298,9 @@ details summary {
 ```
 </details>
 
-<div class="api-endpoint">
-  <div class="method get">GET</div>
-  <div class="path">/feedback</div>
-  <div class="description">Get all feedback from the authenticated user (Requires JWT)</div>
-</div>
+**GET /feedback** - Get all feedback from the authenticated user (Requires JWT)
 
-<div class="api-endpoint">
-  <div class="method put">PUT</div>
-  <div class="path">/feedback/:id</div>
-  <div class="description">Update feedback (Requires JWT)</div>
-</div>
+**PUT /feedback/:id** - Update feedback (Requires JWT)
 
 <details>
 <summary>Example Request</summary>
@@ -383,21 +313,11 @@ details summary {
 ```
 </details>
 
-<div class="api-endpoint">
-  <div class="method delete">DELETE</div>
-  <div class="path">/feedback/:id</div>
-  <div class="description">Delete feedback (Requires JWT)</div>
-</div>
+**DELETE /feedback/:id** - Delete feedback (Requires JWT)
 
 #### 📊 Analytics
 
-<div class="api-endpoint">
-  <div class="method get">GET</div>
-  <div class="path">/feedback/stats</div>
-  <div class="description">Get feedback statistics (Requires JWT)</div>
-</div>
-
-</div>
+**GET /feedback/stats** - Get feedback statistics (Requires JWT)
 
 <style>
 .put {
@@ -412,33 +332,23 @@ details summary {
 
 ## 🧪 Testing
 
-<div class="testing-section">
-  <div class="test-card">
-    <div class="test-icon">🔍</div>
-    <div class="test-content">
-      <h4>Deployment Verification</h4>
-      <p>The <code>verify_deployment.sh</code> script checks if all services and connections are working correctly.</p>
-      <div class="test-command">
-        <code>./verify_deployment.sh</code>
-      </div>
-    </div>
-  </div>
-  
-  <div class="test-card">
-    <div class="test-icon">🔄</div>
-    <div class="test-content">
-      <h4>Integration Tests</h4>
-      <p>The <code>test_microservices.sh</code> script performs end-to-end integration tests across all services.</p>
-      <div class="test-command">
-        <code>./test_microservices.sh</code>
-      </div>
-    </div>
-  </div>
-</div>
+### 🔍 Deployment Verification
+
+The `verify_deployment.sh` script checks if all services and connections are working correctly.
+
+```bash
+./verify_deployment.sh
+```
+
+### 🔄 Integration Tests
+
+The `test_microservices.sh` script performs end-to-end integration tests across all services.
+
+```bash
+./test_microservices.sh
+```
 
 ## 📁 Project Structure
-
-<div class="directory-structure">
 
 ```
 go_microsvc/
@@ -468,8 +378,6 @@ go_microsvc/
     ├── 📄 Dockerfile                # Container definition
     └── 📄 go.mod                    # Go module file
 ```
-
-</div>
 
 <style>
 .testing-section {
@@ -520,135 +428,24 @@ go_microsvc/
 
 ## 📝 Notes
 
-<div class="notes">
-  <ul>
-    <li>🍔 All food items are initialized with 1000 units of quantity and a price of 10.</li>
-    <li>👤 A default test user is created with username <code>testuser</code> and password <code>password123</code>.</li>
-    <li>🔐 For simplicity, authentication uses plain text password comparison.</li>
-    <li>🏛️ The project demonstrates key microservices principles:
-      <div class="principles">
-        <div class="principle">Service<br>Independence</div>
-        <div class="principle">Decentralized<br>Data</div>
-        <div class="principle">Async<br>Communication</div>
-        <div class="principle">Tech<br>Diversity</div>
-        <div class="principle">Independent<br>Deployment</div>
-      </div>
-    </li>
-  </ul>
-</div>
+- 🍔 All food items are initialized with 1000 units of quantity and a price of 10.
+- 👤 A default test user is created with username `testuser` and password `password123`.
+- 🔐 For simplicity, authentication uses plain text password comparison.
+- 🏛️ The project demonstrates key microservices principles:
+  - **Service Independence**: Each service has its own codebase and database
+  - **Decentralized Data**: Each service manages its own data
+  - **Async Communication**: Services communicate via events through Kafka
+  - **Tech Diversity**: Different database approaches (SQL vs GORM)
+  - **Independent Deployment**: Each service can be deployed separately
 
 ## 🔮 Future Improvements
 
-<div class="future-improvements">
-  <div class="improvement">
-    <div class="improvement-icon">🔀</div>
-    <div class="improvement-content">
-      <h4>API Gateway</h4>
-      <p>Add an API gateway for routing and cross-cutting concerns</p>
-    </div>
-  </div>
-  
-  <div class="improvement">
-    <div class="improvement-icon">🔍</div>
-    <div class="improvement-content">
-      <h4>Service Discovery</h4>
-      <p>Implement service registry for dynamic service discovery</p>
-    </div>
-  </div>
-  
-  <div class="improvement">
-    <div class="improvement-icon">🛡️</div>
-    <div class="improvement-content">
-      <h4>Circuit Breakers</h4>
-      <p>Add resilience patterns to handle service outages</p>
-    </div>
-  </div>
-  
-  <div class="improvement">
-    <div class="improvement-icon">🔍</div>
-    <div class="improvement-content">
-      <h4>Distributed Tracing</h4>
-      <p>Implement tracing to monitor request flows</p>
-    </div>
-  </div>
-  
-  <div class="improvement">
-    <div class="improvement-icon">📊</div>
-    <div class="improvement-content">
-      <h4>Centralized Logging</h4>
-      <p>Set up centralized logging across services</p>
-    </div>
-  </div>
-</div>
+1. 🔀 **API Gateway**: Add an API gateway for routing and cross-cutting concerns
+2. 🔍 **Service Discovery**: Implement service registry for dynamic service discovery
+3. 🛡️ **Circuit Breakers**: Add resilience patterns to handle service outages
+4. 🔍 **Distributed Tracing**: Implement tracing to monitor request flows
+5. 📊 **Centralized Logging**: Set up centralized logging across services
 
-<style>
-.notes {
-  background-color: #f8f9fa;
-  border-left: 4px solid #4CAF50;
-  padding: 15px;
-  margin: 20px 0;
-  border-radius: 0 5px 5px 0;
-}
-.notes ul {
-  padding-left: 20px;
-  margin: 0;
-}
-.notes li {
-  margin-bottom: 10px;
-}
-.principles {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin: 10px 0 0 20px;
-}
-.principle {
-  background-color: #e7f3ff;
-  border: 1px solid #b3d8ff;
-  border-radius: 5px;
-  padding: 10px;
-  text-align: center;
-  font-size: 0.9em;
-  flex: 1;
-  min-width: 100px;
-}
-.future-improvements {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
-  margin: 20px 0;
-}
-.improvement {
-  display: flex;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  padding: 15px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-.improvement-icon {
-  font-size: 2em;
-  margin-right: 15px;
-  display: flex;
-  align-items: center;
-}
-.improvement-content h4 {
-  margin-top: 0;
-  margin-bottom: 5px;
-  color: #333;
-}
-.improvement-content p {
-  margin: 0;
-  color: #555;
-}
-footer {
-  margin-top: 50px;
-  padding-top: 20px;
-  border-top: 1px solid #eee;
-  text-align: center;
-  color: #777;
-}
-</style>
+---
 
-<footer>
-  <p>🍽️ Restaurant Microservices Architecture - Developed with ❤️ using Go and Kafka</p>
-</footer>
+🍽️ Restaurant Microservices Architecture - Developed with ❤️ using Go and Kafka
