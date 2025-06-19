@@ -581,10 +581,6 @@ go_microsvc/
   </div>
 </div>
 
-<footer>
-  <p>🍽️ Restaurant Microservices Architecture - Developed with ❤️ using Go and Kafka</p>
-</footer>
-
 <style>
 .notes {
   background-color: #f8f9fa;
@@ -652,3 +648,7 @@ footer {
   color: #777;
 }
 </style>
+
+<footer>
+  <p>🍽️ Restaurant Microservices Architecture - Developed with ❤️ using Go and Kafka</p>
+</footer>
