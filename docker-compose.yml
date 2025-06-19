@@ -1,0 +1,133 @@
+
+services:
+  # Kafka and Zookeeper for message queuing between services
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.3.0
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - microservices-network
+
+  kafka:
+    image: confluentinc/cp-kafka:7.3.0
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - microservices-network
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-topics --bootstrap-server localhost:9092 --list"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Restaurant ordering service
+  restaurant-db:
+    image: postgres:15
+    container_name: restaurant-db
+    ports:
+      - "5434:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=restaurant_db
+    volumes:
+      - restaurant-postgres-data:/var/lib/postgresql/data
+    networks:
+      - microservices-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  restaurant-service:
+    build:
+      context: ./restaurant_ordering_service
+      dockerfile: Dockerfile
+    container_name: restaurant-service
+    ports:
+      - "8080:8080"
+    depends_on:
+      restaurant-db:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    environment:
+      - PORT=8080
+      - JWT_SECRET=your-secret-key
+      - DB_HOST=restaurant-db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=restaurant_db
+      - KAFKA_BROKERS=kafka:29092
+    restart: on-failure
+    networks:
+      - microservices-network
+
+  # User feedback service
+  feedback-db:
+    image: postgres:15
+    container_name: feedback-db
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=feedback_db
+    volumes:
+      - feedback-postgres-data:/var/lib/postgresql/data
+    networks:
+      - microservices-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  feedback-service:
+    build:
+      context: ./user_feedback_service
+      dockerfile: Dockerfile
+    container_name: feedback-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      feedback-db:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    environment:
+      - PORT=8081
+      - JWT_SECRET=your-secret-key
+      - DB_HOST=feedback-db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=feedback_db
+      - KAFKA_BROKERS=kafka:29092
+    restart: on-failure
+    networks:
+      - microservices-network
+
+networks:
+  microservices-network:
+    driver: bridge
+
+volumes:
+  restaurant-postgres-data:
+  feedback-postgres-data:
