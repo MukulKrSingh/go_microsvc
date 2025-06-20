@@ -213,57 +213,6 @@ docker-compose up -d
 </details>
 </div>
 
-<style>
-.api-container {
-  margin-bottom: 30px;
-}
-.api-endpoint {
-  display: flex;
-  align-items: center;
-  margin-bottom: 10px;
-  padding: 10px;
-  border-radius: 5px;
-  background-color: #f8f9fa;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-.method {
-  font-weight: bold;
-  padding: 5px 10px;
-  border-radius: 4px;
-  margin-right: 15px;
-  min-width: 60px;
-  text-align: center;
-}
-.get {
-  background-color: #61affe;
-  color: white;
-}
-.post {
-  background-color: #49cc90;
-  color: white;
-}
-.path {
-  font-family: monospace;
-  font-size: 16px;
-  margin-right: 15px;
-  color: #3b4151;
-}
-.description {
-  color: #555;
-}
-details {
-  margin-left: 20px;
-  margin-bottom: 20px;
-  padding: 10px;
-  background-color: #f0f0f0;
-  border-radius: 5px;
-}
-details summary {
-  cursor: pointer;
-  color: #0077cc;
-  font-weight: bold;
-}
-</style>
 
 ### 🌟 User Feedback Service (port 8081)
 
