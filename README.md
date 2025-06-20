@@ -328,52 +328,7 @@ go_microsvc/
     └── 📄 go.mod                    # Go module file
 ```
 
-<style>
-.testing-section {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  margin: 20px 0;
-}
-.test-card {
-  flex: 1;
-  min-width: 300px;
-  display: flex;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 15px;
-  background-color: #f9f9f9;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-.test-icon {
-  font-size: 2em;
-  margin-right: 15px;
-  display: flex;
-  align-items: center;
-}
-.test-content {
-  flex: 1;
-}
-.test-content h4 {
-  margin-top: 0;
-  margin-bottom: 10px;
-  color: #333;
-}
-.test-command {
-  background-color: #f0f0f0;
-  padding: 8px 12px;
-  border-radius: 4px;
-  margin-top: 10px;
-  display: inline-block;
-}
-.directory-structure {
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  padding: 15px;
-  box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
-  overflow-x: auto;
-}
-</style>
+
 
 ## 📝 Notes
 
