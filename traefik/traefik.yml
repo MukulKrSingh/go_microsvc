@@ -1,0 +1,26 @@
+api:
+  dashboard: true
+  insecure: true
+
+entryPoints:
+  web:
+    address: ":80"
+  dashboard:
+    address: ":8082"
+
+# Enable Docker provider for dynamic configuration
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+    network: microservices-network
+  file:
+    directory: "/etc/traefik/dynamic"
+    watch: true
+
+# Access logs configuration
+accessLog: {}
+
+# Log configuration
+log:
+  level: INFO

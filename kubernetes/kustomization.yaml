@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: restaurant-app
+
+resources:
+- 00-namespace.yaml
+- 01-zookeeper.yaml
+- 02-kafka.yaml
+- 03-restaurant-db.yaml
+- 04-feedback-db.yaml
+- 05-secrets.yaml
+- 06-restaurant-service.yaml
+- 07-feedback-service.yaml
+- 08-traefik.yaml
+- 09-ingress.yaml

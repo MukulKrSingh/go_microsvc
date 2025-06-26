@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: feedback-service
+  namespace: restaurant-app
+spec:
+  selector:
+    matchLabels:
+      app: feedback-service
+  template:
+    metadata:
+      labels:
+        app: feedback-service
+    spec:
+      containers:
+      - name: feedback-service
+        image: ${DOCKER_REGISTRY}/feedback-service:latest  # Replace with your actual image
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8081
+        env:
+        - name: PORT
+          value: "8081"
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: jwt-secret
+        - name: DB_HOST
+          value: "feedback-db"
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: feedback-db-user
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: feedback-db-password
+        - name: DB_NAME
+          value: "feedback_db"
+        - name: KAFKA_BROKERS
+          value: "kafka:9092"
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8081
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8081
+          initialDelaySeconds: 15
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: feedback-service
+  namespace: restaurant-app
+spec:
+  selector:
+    app: feedback-service
+  ports:
+  - port: 8081
+    targetPort: 8081
+  type: ClusterIP

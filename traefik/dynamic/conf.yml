@@ -1,0 +1,68 @@
+http:
+  middlewares:
+    auth-headers:
+      headers:
+        accessControlAllowMethods:
+          - "GET"
+          - "POST"
+          - "PUT"
+          - "DELETE"
+          - "OPTIONS"
+        accessControlAllowHeaders:
+          - "Content-Type"
+          - "Authorization"
+        accessControlAllowOriginList:
+          - "*"
+        accessControlMaxAge: 100
+        addVaryHeader: true
+
+    rate-limit:
+      rateLimit:
+        average: 100
+        burst: 50
+
+  routers:
+    api-restaurant:
+      rule: "PathPrefix(`/api/restaurant`)"
+      service: restaurant-service
+      middlewares:
+        - "auth-headers"
+        - "rate-limit"
+        - "strip-restaurant-prefix"
+
+    api-feedback:
+      rule: "PathPrefix(`/api/feedback`)"
+      service: feedback-service
+      middlewares:
+        - "auth-headers"
+        - "rate-limit"
+        - "strip-feedback-prefix"
+
+    # Dashboard route
+    dashboard:
+      rule: "PathPrefix(`/dashboard`)"
+      service: api@internal
+      middlewares:
+        - "auth-headers"
+      
+  middlewares:
+    strip-restaurant-prefix:
+      stripPrefix:
+        prefixes:
+          - "/api/restaurant"
+    
+    strip-feedback-prefix:
+      stripPrefix:
+        prefixes:
+          - "/api/feedback"
+
+  services:
+    restaurant-service:
+      loadBalancer:
+        servers:
+          - url: "http://restaurant-service:8080"
+
+    feedback-service:
+      loadBalancer:
+        servers:
+          - url: "http://feedback-service:8081"

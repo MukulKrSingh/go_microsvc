@@ -56,7 +56,7 @@ fi
 # Verify each required container is running correctly
 log "Checking container status:" $BLUE
 # List of all required containers that should be running
-containers=("zookeeper" "kafka" "restaurant-db" "restaurant-service" "feedback-db" "feedback-service")
+containers=("api-gateway" "zookeeper" "kafka" "restaurant-db" "restaurant-service" "feedback-db" "feedback-service")
 for container in "${containers[@]}"; do
   # Get the container status using Docker inspect
   status=$(docker inspect --format '{{.State.Status}}' "$container" 2>/dev/null)
@@ -128,8 +128,21 @@ echo
 # Verify service APIs are accessible from the host machine
 log "Checking API accessibility from host machine:" $BLUE
 
-# Check restaurant service API accessibility
-# This test hits a public endpoint that doesn't require authentication
+# Check API Gateway accessibility
+if curl -s "http://localhost:80" > /dev/null 2>&1; then
+  success "✅ API Gateway is accessible on port 80"
+else
+  error "❌ Cannot access API Gateway on port 80"
+fi
+
+# Check API Gateway access to restaurant service
+if curl -s "http://localhost:80/api/restaurant/food-items" > /dev/null 2>&1; then
+  success "✅ Restaurant service API is accessible via API Gateway on /api/restaurant path"
+else
+  log "⚠️ Cannot access restaurant service API via API Gateway. This might need further configuration." $YELLOW
+fi
+
+# Check direct restaurant service API accessibility
 if curl -s "http://localhost:8080/food-items" > /dev/null; then
   success "✅ Restaurant service API is accessible on port 8080"
 else

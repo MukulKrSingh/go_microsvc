@@ -5,6 +5,8 @@
 [![Kafka](https://img.shields.io/badge/Kafka-Event%20Streaming-red.svg)](https://kafka.apache.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-blue.svg)](https://www.postgresql.org/)
 [![Docker](https://img.shields.io/badge/Docker-Containerization-blue.svg)](https://www.docker.com/)
+[![Traefik](https://img.shields.io/badge/Traefik-API%20Gateway-orange.svg)](https://traefik.io/)
+[![Kubernetes](https://img.shields.io/badge/Kubernetes-Orchestration-326CE5.svg)](https://kubernetes.io/)
 
 > 🚀 A modern, scalable restaurant ordering system built with microservices
 
@@ -13,13 +15,30 @@ This project demonstrates a microservices architecture for a restaurant ordering
 ## 🏗️ Architecture Overview
 
 <div align="center">
-  <img src="docs/architecture-diagram.svg" alt="Microservices Architecture Diagram" width="700">
+  <img src="docs/architecture-with-gateway.svg" alt="Microservices Architecture Diagram with API Gateway" width="700">
 </div>
+
+### Deployment Options
+
+This project can be deployed using either:
+
+- **Docker Compose**: For local development and testing
+- **Kubernetes**: For production and scalable deployments (see the [kubernetes](./kubernetes) directory)
 
 <details>
 <summary>View ASCII Architecture Diagram</summary>
 
 ```
+                 ┌─────────────────────┐
+                 │                     │
+                 │   API Gateway       │
+                 │   (Traefik)         │
+                 │                     │
+                 └───────┬─────────────┘
+                         │
+          ┌──────────────┴───────────────┐
+          │                              │
+          ▼                              ▼
 ┌─────────────────────┐     ┌──────────────────┐
 │                     │     │                  │
 │  Restaurant Order   │     │  User Feedback   │
@@ -50,13 +69,24 @@ This project demonstrates a microservices architecture for a restaurant ordering
 
 ## 🔍 Services Description
 
+### 🔀 API Gateway
+
+| Feature | Description |
+|---------|-------------|
+| **Features** | Routing, load balancing, API endpoints consolidation |
+| **Tech Stack** | Traefik |
+| **Dashboard Port** | 8082 |
+| **HTTP Port** | 80 |
+| **Gateway Paths** | `/api/restaurant/*`, `/api/feedback/*` |
+
 ### 🍲 Restaurant Ordering Service
 
 | Feature | Description |
 |---------|-------------|
 | **Features** | Authentication, food menu, ordering, transactions |
 | **Tech Stack** | Go, Gin, PostgreSQL (SQL), Kafka Producer |
-| **API Port** | 8080 |
+| **Direct API Port** | 8080 |
+| **Gateway Path** | `/api/restaurant` |
 | **Database** | PostgreSQL on port 5434 (mapped to container's 5432) |
 
 ### 🌟 User Feedback Service
@@ -65,7 +95,8 @@ This project demonstrates a microservices architecture for a restaurant ordering
 |---------|-------------|
 | **Features** | Feedback collection and analysis for orders |
 | **Tech Stack** | Go, Gin, PostgreSQL (GORM), Kafka Consumer |
-| **API Port** | 8081 |
+| **Direct API Port** | 8081 |
+| **Gateway Path** | `/api/feedback` |
 | **Database** | PostgreSQL on port 5433 (mapped to container's 5432) |
 
 ## 🌊 Data Flow
@@ -115,6 +146,35 @@ docker-compose up -d
 ./test_microservices.sh
 ```
 
+#### Step 5: Access the API Gateway
+
+Once all services are up and running, you can access them through the API Gateway:
+
+- **Traefik Dashboard**: [http://localhost:8082/dashboard/](http://localhost:8082/dashboard/)
+- **Restaurant Service API**: [http://localhost/api/restaurant/food-items](http://localhost/api/restaurant/food-items)
+- **Feedback Service API**: [http://localhost/api/feedback/health](http://localhost/api/feedback/health)
+
+The API Gateway provides:
+- **Centralized Routing**: All requests go through a single entry point
+- **Path-Based Routing**: Routes requests based on URL path prefixes
+- **Rate Limiting**: Prevents abuse with built-in rate limiting
+- **CORS Headers**: Automatically adds needed CORS headers
+- **Dashboard**: Visual interface to monitor traffic and routes
+
+### Kubernetes Deployment
+
+To deploy to Kubernetes instead of Docker Compose:
+
+```bash
+# Deploy with default local registry
+./deploy_kubernetes.sh
+
+# Or specify a custom registry
+./deploy_kubernetes.sh my-registry.io
+```
+
+For more details on Kubernetes deployment, see the [kubernetes](./kubernetes) directory.
+
 ### 💻 Development Environment
 
 <details>
@@ -156,11 +216,20 @@ docker-compose up -d
 
 ## 📘 API Documentation
 
-### 🍽️ Restaurant Ordering Service (port 8080)
+### 🔀 API Gateway Endpoints
+
+| Service | Direct Access | Gateway Access |
+|---------|---------------|---------------|
+| Restaurant Service | `http://localhost:8080` | `http://localhost/api/restaurant` |
+| Feedback Service | `http://localhost:8081` | `http://localhost/api/feedback` |
+| Traefik Dashboard | N/A | `http://localhost:8082` |
+
+### 🍽️ Restaurant Ordering Service
 
 #### 🔑 Authentication
 
-**POST /auth** - Authenticate a user and get a JWT token
+**POST /api/restaurant/auth** - Authenticate a user and get a JWT token
+**POST /auth** - Direct access endpoint
 
 <details>
 <summary>Example Request</summary>
@@ -175,15 +244,18 @@ docker-compose up -d
 
 #### 🍔 Food Items
 
-**GET /food-items** - Get list of available food items
+**GET /api/restaurant/food-items** - Get list of available food items (via Gateway)
+**GET /food-items** - Direct access endpoint
 
 #### 👤 User Profile
 
-**GET /profile** - Get authenticated user's profile (Requires JWT)
+**GET /api/restaurant/profile** - Get authenticated user's profile (Requires JWT, via Gateway)
+**GET /profile** - Direct access endpoint (Requires JWT)
 
 #### 📋 Orders
 
-**POST /orders** - Place a new order (Requires JWT)
+**POST /api/restaurant/orders** - Place a new order (Requires JWT, via Gateway)
+**POST /orders** - Direct access endpoint (Requires JWT)
 
 <details>
 <summary>Example Request</summary>
@@ -200,7 +272,8 @@ docker-compose up -d
 
 #### 💳 Transactions
 
-**POST /transactions** - Complete a transaction for an order (Requires JWT)
+**POST /api/restaurant/transactions** - Complete a transaction for an order (Requires JWT, via Gateway)
+**POST /transactions** - Direct access endpoint (Requires JWT)
 
 <details>
 <summary>Example Request</summary>
@@ -214,11 +287,12 @@ docker-compose up -d
 </div>
 
 
-### 🌟 User Feedback Service (port 8081)
+### 🌟 User Feedback Service
 
 #### 🔑 Authentication
 
-**POST /auth** - Authenticate a user and get a JWT token
+**POST /api/feedback/auth** - Authenticate a user and get a JWT token (via Gateway)
+**POST /auth** - Direct access endpoint
 
 <details>
 <summary>Example Request</summary>
@@ -233,7 +307,8 @@ docker-compose up -d
 
 #### 📝 Feedback Management
 
-**POST /feedback** - Submit feedback for an order (Requires JWT)
+**POST /api/feedback/feedback** - Submit feedback for an order (Requires JWT, via Gateway)
+**POST /feedback** - Direct access endpoint (Requires JWT)
 
 <details>
 <summary>Example Request</summary>
@@ -247,9 +322,11 @@ docker-compose up -d
 ```
 </details>
 
-**GET /feedback** - Get all feedback from the authenticated user (Requires JWT)
+**GET /api/feedback/feedback** - Get all feedback from the authenticated user (Requires JWT, via Gateway)
+**GET /feedback** - Direct access endpoint (Requires JWT)
 
-**PUT /feedback/:id** - Update feedback (Requires JWT)
+**PUT /api/feedback/feedback/:id** - Update feedback (Requires JWT, via Gateway)
+**PUT /feedback/:id** - Direct access endpoint (Requires JWT)
 
 <details>
 <summary>Example Request</summary>
@@ -262,11 +339,13 @@ docker-compose up -d
 ```
 </details>
 
-**DELETE /feedback/:id** - Delete feedback (Requires JWT)
+**DELETE /api/feedback/feedback/:id** - Delete feedback (Requires JWT, via Gateway)
+**DELETE /feedback/:id** - Direct access endpoint (Requires JWT)
 
 #### 📊 Analytics
 
-**GET /feedback/stats** - Get feedback statistics (Requires JWT)
+**GET /api/feedback/feedback/stats** - Get feedback statistics (Requires JWT, via Gateway)
+**GET /feedback/stats** - Direct access endpoint (Requires JWT)
 
 <style>
 .put {
@@ -283,10 +362,33 @@ docker-compose up -d
 
 ### 🔍 Deployment Verification
 
-The `verify_deployment.sh` script checks if all services and connections are working correctly.
+The `verify_deployment.sh` script checks if all services and connections are working correctly, including the API Gateway.
 
 ```bash
 ./verify_deployment.sh
+```
+
+### 🔀 Testing the API Gateway
+
+You can use the provided script to test all API Gateway endpoints:
+
+```bash
+./test_api_gateway.sh
+```
+
+Or test individual endpoints manually:
+
+```bash
+# Check if the API Gateway is accessible
+curl http://localhost/
+
+# Get food items through the API Gateway
+curl http://localhost/api/restaurant/food-items
+
+# Login through the API Gateway (returns a JWT token)
+curl -X POST -H "Content-Type: application/json" \
+  -d '{"username":"testuser", "password":"password123"}' \
+  http://localhost/api/restaurant/auth
 ```
 
 ### 🔄 Integration Tests
@@ -303,7 +405,14 @@ The `test_microservices.sh` script performs end-to-end integration tests across 
 go_microsvc/
 ├── 📄 docker-compose.yml            # Main container orchestration
 ├── 📄 test_microservices.sh         # Integration test script
+├── 📄 test_api_gateway.sh           # API Gateway test script
 ├── 📄 verify_deployment.sh          # Deployment verification script
+├── 📁 traefik/                      # API Gateway configuration
+├── 📁 kubernetes/                   # Kubernetes deployment manifests
+│   ├── 📄 traefik.yml               # Main Traefik configuration
+│   ├── 📁 dynamic/                  # Dynamic config directory
+│   │   └── 📄 conf.yml              # Routes, middlewares, services
+│   └── 📄 Dockerfile                # Traefik container definition
 ├── 📁 restaurant_ordering_service/  # Restaurant ordering service
 │   ├── 📁 cmd/                      # Service entry point
 │   ├── 📁 internal/                 # Service implementation
@@ -344,11 +453,12 @@ go_microsvc/
 
 ## 🔮 Future Improvements
 
-1. 🔀 **API Gateway**: Add an API gateway for routing and cross-cutting concerns
-2. 🔍 **Service Discovery**: Implement service registry for dynamic service discovery
-3. 🛡️ **Circuit Breakers**: Add resilience patterns to handle service outages
-4. 🔍 **Distributed Tracing**: Implement tracing to monitor request flows
-5. 📊 **Centralized Logging**: Set up centralized logging across services
+1.  **Service Discovery**: Implement service registry for dynamic service discovery
+2. 🛡️ **Circuit Breakers**: Add resilience patterns to handle service outages
+3. 🔍 **Distributed Tracing**: Implement tracing to monitor request flows
+4. 📊 **Centralized Logging**: Set up centralized logging across services
+5. 🔒 **Enhanced API Gateway Security**: Add rate limiting, JWT validation, and other security features to the API Gateway
+6. ☁️ **Kubernetes Autoscaling**: Configure Horizontal Pod Autoscaler for automatic scaling in Kubernetes
 
 ---
 

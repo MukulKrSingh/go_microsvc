@@ -1,5 +1,23 @@
 
 services:
+  # API Gateway
+  api-gateway:
+    build:
+      context: ./traefik
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "80:80"      # HTTP
+      - "8082:8082"  # Dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - microservices-network
+    restart: always
+    depends_on:
+      - restaurant-service
+      - feedback-service
+  
   # Kafka and Zookeeper for message queuing between services
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.0
@@ -78,6 +96,10 @@ services:
     restart: on-failure
     networks:
       - microservices-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.restaurant.rule=PathPrefix(`/api/restaurant`)"
+      - "traefik.http.services.restaurant.loadbalancer.server.port=8080"
 
   # User feedback service
   feedback-db:
@@ -123,6 +145,10 @@ services:
     restart: on-failure
     networks:
       - microservices-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.feedback.rule=PathPrefix(`/api/feedback`)"
+      - "traefik.http.services.feedback.loadbalancer.server.port=8081"
 
 networks:
   microservices-network:

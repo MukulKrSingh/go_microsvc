@@ -21,6 +21,9 @@ NC='\033[0m'        # No Color (reset)
 # Service endpoints
 RESTAURANT_SERVICE="http://localhost:8080"
 FEEDBACK_SERVICE="http://localhost:8081"
+API_GATEWAY="http://localhost:80"
+GATEWAY_RESTAURANT_PATH="/api/restaurant"
+GATEWAY_FEEDBACK_PATH="/api/feedback"
 
 # === Utility Functions ===
 
@@ -249,6 +252,41 @@ test_request "Get Feedback Stats" "GET" "$FEEDBACK_SERVICE/feedback/stats" "" "$
 # This verifies that users can remove their feedback
 log "Testing Delete Feedback" $YELLOW
 test_request "Delete Feedback" "DELETE" "$FEEDBACK_SERVICE/feedback/$feedback_id" "" "$feedback_token"
+
+# ===============================================
+# === API Gateway Integration Tests          ===
+# ===============================================
+log "Testing API Gateway Integration" $BLUE
+echo
+
+# Test restaurant service through API gateway
+log "Testing Restaurant Service via API Gateway" $YELLOW
+gateway_food_items=$(test_request "API Gateway - Get Food Items" "GET" "$API_GATEWAY$GATEWAY_RESTAURANT_PATH/food-items" "")
+
+# Test authentication through API gateway for restaurant service
+log "Testing Authentication via API Gateway - Restaurant Service" $YELLOW
+gateway_restaurant_auth_response=$(test_request "API Gateway - Restaurant Auth" "POST" "$API_GATEWAY$GATEWAY_RESTAURANT_PATH/auth" \
+  '{"username": "testuser", "password": "password123"}')
+gateway_restaurant_token=$(echo "$gateway_restaurant_auth_response" | grep -o '"token":"[^"]*' | cut -d'"' -f4)
+
+if [[ -n "$gateway_restaurant_token" ]]; then
+  success "✅ Authentication through API gateway successful!"
+else
+  error "❌ Failed to authenticate through API gateway"
+fi
+
+# Test feedback service through API gateway
+log "Testing Feedback Service via API Gateway" $YELLOW
+gateway_feedback_auth_response=$(test_request "API Gateway - Feedback Auth" "POST" "$API_GATEWAY$GATEWAY_FEEDBACK_PATH/auth" \
+  '{"username": "testuser", "password": "password123"}')
+gateway_feedback_token=$(echo "$gateway_feedback_auth_response" | grep -o '"token":"[^"]*' | cut -d'"' -f4)
+
+# Test retrieving feedback through API gateway
+if [[ -n "$gateway_feedback_token" ]]; then
+  test_request "API Gateway - Get User Feedback" "GET" "$API_GATEWAY$GATEWAY_FEEDBACK_PATH/feedback" "" "$gateway_feedback_token"
+else
+  error "❌ Failed to authenticate through API gateway for feedback service"
+fi
 
 # === Test Completion ===
 # If we've reached this point, all tests have passed
